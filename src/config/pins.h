@@ -48,8 +48,15 @@
 #define RELAY_3            27
 #define RELAY_4            14
 
-// Future relay expansion
+// Reserved for Future
 #define RELAY_5            -1
 #define RELAY_6            -1
 #define RELAY_7            -1
 #define RELAY_8            -1
+
+// =========================
+// Safety Inputs (Future)
+// =========================
+#define WATER_LEVEL_PIN    -1
+#define DOOR_SENSOR_PIN    -1
+#define E_STOP_PIN         -1
