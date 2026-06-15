@@ -1,38 +1,58 @@
 #include <Arduino.h>
-#include <Wire.h>
+
+#include "display/oled.h"
+#include "rtc/rtc_manager.h"
+#include "system/sensor_data.h"
+#include "system/led_manager.h"
+#include "buzzer/buzzer.h"
+#include "communication/modbus_manager.h"
 
 void setup()
 {
     Serial.begin(115200);
 
-    Wire.begin(21, 22);
+    initLEDs();
 
-    Serial.println("I2C Scanner");
+    initBuzzer();
+
+    initRS485();
+
+    startupBeep();
+
+    initOLED();
+
+    oledBootScreen();
+
+    delay(3000);
+
+    if(initRTC())
+    {
+        Serial.println("RTC OK");
+
+        setAlarmLED(false);
+    }
+    else
+    {
+        Serial.println("RTC ERROR");
+
+        errorBeep();
+
+        setAlarmLED(true);
+    }
+
+    sensors.roomTemperature = 30.5;
+    sensors.roomHumidity = 92.0;
+    sensors.lux = 350;
+    sensors.co2 = 1200;
 }
 
 void loop()
 {
-    byte error;
-    int address;
-    int count = 0;
+    updateHeartbeat();
 
-    Serial.println("Scanning...");
+    Serial.println(getDateTimeString());
 
-    for(address = 1; address < 127; address++)
-    {
-        Wire.beginTransmission(address);
-        error = Wire.endTransmission();
+    oledStatusScreen();
 
-        if(error == 0)
-        {
-            Serial.print("Found device at 0x");
-            Serial.println(address, HEX);
-            count++;
-        }
-    }
-
-    if(count == 0)
-        Serial.println("No I2C devices found");
-
-    delay(5000);
+    delay(1000);
 }
