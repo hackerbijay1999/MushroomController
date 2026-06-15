@@ -1,18 +1,38 @@
 #include <Arduino.h>
+#include <Wire.h>
 
 void setup()
 {
     Serial.begin(115200);
 
-    Serial.println();
-    Serial.println("=================================");
-    Serial.println("Creative Pathbreakers");
-    Serial.println("Mushroom Controller V0.0.1");
-    Serial.println("=================================");
+    Wire.begin(21, 22);
+
+    Serial.println("I2C Scanner");
 }
 
 void loop()
 {
-    Serial.println("System Running...");
-    delay(1000);
+    byte error;
+    int address;
+    int count = 0;
+
+    Serial.println("Scanning...");
+
+    for(address = 1; address < 127; address++)
+    {
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+
+        if(error == 0)
+        {
+            Serial.print("Found device at 0x");
+            Serial.println(address, HEX);
+            count++;
+        }
+    }
+
+    if(count == 0)
+        Serial.println("No I2C devices found");
+
+    delay(5000);
 }
